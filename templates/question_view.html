@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+<div class="container">
+    <div class="col-md-10 offset-md-1 mt-5">
+        <div class="jumbotron">
+            <h1 class="display-4 m-3 text-center">Teacher Panel</h1>
+            <hr class="my-4">
+            <div class="row justify-content-center">
+                <div class="col-md-4 col-xl-4">
+                    <div class="card bg-c-gtx order-card">
+                        <div class="card-block">
+                            <h6 class="m-b-20 text-center">Registered Students </h6>
+                            <h2 class="text-center"><i class="fas fa-user-graduate f-left"></i><span>
+                                    {{student_count}}</span>
+                            </h2>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-xl-4">
+                    <div class="card bg-c-yellow order-card">
+                        <div class="card-block">
+                            <h6 class="m-b-20 text-center">Total Subjects</h6>
+                            <h2 class="text-center"><i class="fas fa-book f-left"></i><span> {{subject_count}}</span>
+                            </h2>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h1 class="display-6 m-3 text-center">Questions Panel</h1>
+            <hr class="my-4">
+            <div class="container">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                    </div>
+                    <table class="table table-hover table-bordered" id="dev-table">
+                        <thead>
+                            <tr>
+
+                                <th>Subject</th>
+                                <th>Question Text</th>
+                                <th>Score</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% if my_param %}
+                            {% for my_params in my_param %}
+                            <tr>
+                                <td>{{ my_params.exam__subject__name }}</td>
+                                <td>{{ my_params.question_text }}</td>
+                                <td>{{ my_params.score }}</td>
+                                <td><a class="btn btn-danger btn-xs" style="border-radius: 0%;" value="{{my_params.id}}"
+                                        href="{% url 'question_delete' my_params.id %}"><span
+                                            class="glyphicon glyphicon-trash">Delete</span></a></td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <h4>No Questions found.</h4>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content%}

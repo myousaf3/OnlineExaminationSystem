@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block content%}
+<div class="container">
+    <div class="col-md-10 offset-md-1 mt-5">
+        <div class="jumbotron">
+            <h1 class="display-4 m-3 text-center">Teacher Panel</h1>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-md-4 col-xl-4">
+                    <div class="card bg-c-gtx order-card">
+                        <div class="card-block">
+                            <h6 class="m-b-20 text-center">Registered Students </h6>
+                            <h2 class="text-center"><i class="fas fa-user-graduate f-left"></i><span>
+                                    {{student_count}}</span>
+                            </h2>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-xl-4">
+                    <div class="card bg-c-yellow order-card">
+                        <div class="card-block">
+                            <h6 class="m-b-20 text-center">Total Subjects</h6>
+                            <h2 class="text-center"><i class="fas fa-book f-left"></i><span> {{subject_count}}</span>
+                            </h2>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-xl-4">
+                    <div class="card bg-c-blue order-card">
+                        <div class="card-block">
+                            <h6 class="m-b-20 text-center">Total Questions</h6>
+                            <h2 class="text-center"><i class="fas fa-question-circle f-left"></i><span>
+                                    {{question_count}}</span>
+                            </h2>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h1 class="display-6 m-3 text-center">Add A Question</h1>
+            <hr class="my-4">
+            <form method="post" autocomplete="off" style="margin:100px;margin-top: 0px;">
+                {% csrf_token %}
+                {{ question_form.as_p }}
+                {{ option_form.as_p }}
+                <button type="submit">Submit</button>
+            </form>
+            <!-- <form method="POST" autocomplete="off" style="margin:100px;margin-top: 0px;">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="question">Subject</label>
+                    <select name="courseID" class="form-control" required="" id="id_courseID">
+                        <option value="" selected="">Subject Name</option>
+                        {% for subject in subjects %}
+                        <option>
+                            <li>{{ subject }}</li>
+                            {% empty %}
+                            <li>No subject found.</li>
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                    <br>
+
+                    <label for="question">Question</label>
+                    <textarea name="question" cols="50" rows="3" maxlength="600"
+                        placeholder="Example: What is the relation calculus?" class="form-control" required=""
+                        id="id_question"></textarea>
+                    <br>
+                    <label for="question_number">Marks</label>
+                    <input type="number" name="marks" min="0" placeholder="Example: 5" class="form-control" required=""
+                        id="id_marks">
+                    <br>
+                    <label for="option1">Option 1</label>
+                    <input type="text" name="option1" maxlength="200"
+                        placeholder="Example: It is a kind of procedural language" class="form-control" required=""
+                        id="id_option1">
+                    <br>
+                    <label for="option2">Option 2</label>
+                    <input type="text" name="option2" maxlength="200"
+                        placeholder="Example: It is a non-procedural language" class="form-control" required=""
+                        id="id_option2">
+                    <br>
+                    <label for="option3">Option 3</label>
+                    <input type="text" name="option3" maxlength="200" placeholder="Example: It is a high-level language"
+                        class="form-control" required="" id="id_option3">
+                    <br>
+                    <label for="option4">Option 4</label>
+                    <input type="text" name="option4" maxlength="200"
+                        placeholder="Example: It is Data Definition language" class="form-control" required=""
+                        id="id_option4">
+                    <br>
+                    <label for="answer">Correct Answer</label>
+                    <select name="answer" class="form-control" required="" id="id_answer">
+                        <option value="" selected="">---------</option>
+
+                        <option value="Option1">Option1</option>
+
+                        <option value="Option2">Option2</option>
+
+                        <option value="Option3">Option3</option>
+
+                        <option value="Option4">Option4</option>
+
+                    </select>
+                </div>
+
+
+                <button type="submit" class="btn btn-success" style="border-radius: 0%;">Submit Question</button>
+            </form> -->
+
+            <div class="container">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h6 class="panel-title">Available Subjects</h6>
+                    </div>
+                    <table class="table table-hover table-bordered" id="dev-table">
+                        <thead>
+                            <tr>
+
+                                <th>Subject</th>
+                                <th>Total Question</th>
+                                <th>Approved</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% if exams %}
+                            {% for exam in exams %}
+                            <tr>
+                                <td>{{ exam.id }}</td>
+                                <td>{{ exam }}</td>
+                                <td>{{ exam.questions_count }}</td>
+                                <td>{{ exam.is_approved }}</td>
+                                <td><a class="btn btn-primary btn-xs" value="{{exam}}" style="border-radius: 0%;"
+                                        href="{%url 'question' exam.subject.name%}"><span
+                                            class="glyphicon glyphicon-trash">View Questions</span></a></td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <p>No Subject found.</p>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content%}

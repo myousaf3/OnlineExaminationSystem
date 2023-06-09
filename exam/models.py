@@ -10,13 +10,11 @@ class Profile(models.Model):
     )
     
     user = models.OneToOneField(User, on_delete=models.CASCADE,null=True, blank=True)
-    name = models.CharField(max_length=255,null=True, blank=True)
-    emails = models.EmailField(unique=True,null=True, blank=True)
     user_type = models.CharField(choices=USER_TYPE_CHOICES, max_length=10,null=True, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pictures/')
     
-    def __str__(self):
-        return self.name 
+    def __str__(self):  
+        return self.user.first_name
 
 class Subject(models.Model):
     name = models.CharField(max_length=255)
@@ -37,6 +35,7 @@ class Exam(models.Model):
 
 class Question(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
+    score = models.IntegerField(null=True, blank=True)
     question_text = models.TextField()
     question_type = models.CharField(choices=[('multiple_choice', 'Multiple Choice'), ('text_based', 'Text Based')], max_length=20)
     
@@ -46,23 +45,15 @@ class Question(models.Model):
 
 class Option(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    option_text = models.TextField() 
     option1 = models.CharField(max_length=100,null=True, blank=True)
     option2 = models.CharField(max_length=100,null=True, blank=True)
     option3 = models.CharField(max_length=100,null=True, blank=True)
     option4 = models.CharField(max_length=100,null=True, blank=True)
+    answer = models.IntegerField(choices=[(1, 'Option 1'), (2, 'Option 2'), (3, 'Option 3'), (4, 'Option 4')],null=True, blank=True)
     
     def __str__(self):
             return self.question.question_text
 
-
-class Answer(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    answer_text = models.TextField()
-    is_correct = models.BooleanField(default=False)
-    
-    def __str__(self):
-            return self.question.question_text
 
 class Attempt(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='attempts')
