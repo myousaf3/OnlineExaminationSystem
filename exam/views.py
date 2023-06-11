@@ -97,12 +97,13 @@ def question_view(request,name):
 
 @login_required(login_url='login')
 def student_view(request):
+    exam = Exam.objects.all()
+    attempt = Attempt.objects.all()
     subject_count = Subject.objects.count() 
     student_count = User.objects.count() 
     question_count = Question.objects.count()
-    exam = Exam.objects.all()
     exam_count = Exam.objects.count()
-    return render(request, 'student_dashboard.html', {'exam_count':exam_count,'subject_count':subject_count,'student_count':student_count,'question_count':question_count,'exam':exam})
+    return render(request, 'student_dashboard.html', {'attempt':attempt,'exam_count':exam_count,'subject_count':subject_count,'student_count':student_count,'question_count':question_count,'exam':exam})
 
 @login_required(login_url='login')
 def take_exam_view(request):

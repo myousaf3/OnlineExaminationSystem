@@ -42,12 +42,11 @@
                     </div>
                 </div>
             </div>
-            <h1 class="display-6 m-3 text-center">Available Exams</h1>
             <hr class="my-4">
             <div class="container">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h6 class="panel-title">Available Exams</h6>
+                        <h1 class="display-6 m-3 text-center">Available Exams</h1>
                     </div>
                     <table class="table table-hover table-bordered" id="dev-table">
                         <thead>
@@ -64,8 +63,8 @@
                             <tr>
                                 <td>{{ exams.subject.name }}</td>
                                 <td><a class="btn btn-success btn-sm" style="border-radius:0px;"
-                                    href="/student/take-exam/"><span class="glyphicon glyphicon-check"></span>
-                                    Attend Exam</a></td>
+                                        href="/student/take-exam/"><span class="glyphicon glyphicon-check"></span>
+                                        Attend Exam</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -76,37 +75,28 @@
             <div class="container">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h6 class="panel-title">My Marks</h6>
+                        <h1 class="display-6 m-3 text-center">My Marks</h1>
                     </div>
                     <table class="table table-hover table-bordered" id="dev-table">
                         <thead>
                             <tr>
 
                                 <th>Course</th>
-
-                                <th>Action</th>
+                                <th>Total Marks</th>
+                                <th>Number of Attempts</th>
+                                <th>Exam Date</th>
                             </tr>
                         </thead>
+                        {% for t in attempt %}
+                        <tr>
 
-                        <tbody>
-                            {% if exams %}
-                            {% for exam in exams %}
-                            <tr>
-                                <td>{{ exam.id }}</td>
-                                <td>{{ exam }}</td>
-                                <td>{{ exam.questions_count }}</td>
-                                <td>{{ exam.is_approved }}</td>
-                                <td><a class="btn btn-primary btn-xs" value="{{exam}}" style="border-radius: 0%;"
-                                        href="{%url 'question' exam.subject.name%}"><span
-                                            class="glyphicon glyphicon-trash">View Questions</span></a></td>
-                            </tr>
-                            {% endfor %}
-                            {% else %}
-                            <p>No Subject found.</p>
-                            {% endif %}
-                            
-
-                        </tbody>
+                            <td> {{t.exam}}</td>
+                            <td> {{t.score}}</td>
+                            <td>Attempt {{ forloop.counter }}</td>
+                            <td> {{t.start_time}}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
                     </table>
                 </div>
             </div>
