@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content%}
+{{request.POST}}
+{{req}}
+<div class="container">
+	<div class="col-md-10 offset-md-1 mt-5">
+		<div class="jumbotron">
+			{{actual_answer}}
+			{{selected_ans}}
+			{{select_ans}}
+        </div>
+    </div>
+</div>
+
+
+{% endblock content%}

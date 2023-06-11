@@ -35,7 +35,7 @@ class Exam(models.Model):
 
 class Question(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
-    score = models.IntegerField(null=True, blank=True)
+    score = models.PositiveIntegerField(null=True, blank=True)
     question_text = models.TextField()
     question_type = models.CharField(choices=[('multiple_choice', 'Multiple Choice'), ('text_based', 'Text Based')], max_length=20)
     

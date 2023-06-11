@@ -1,10 +1,12 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect,HttpResponseRedirect, HttpResponse,get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.paginator import Paginator
 from .forms import SignUpForm, UserLoginForm, ExamSubmissionForm,QuestionForm, OptionForm
-from exam.models import Question, Subject, User, Exam
+from exam.models import Question, Subject, User, Exam, Option, Attempt
 from django.db.models import Q
+from exam import models as QMODEL
 
 
 def signup(request): 
@@ -93,3 +95,57 @@ def question_view(request,name):
     )
     return render(request, 'question_view.html', {'my_param': my_param,'subject_count':subject_count,'student_count':student_count,'question_count':question_count})
 
+@login_required(login_url='login')
+def student_view(request):
+    subject_count = Subject.objects.count() 
+    student_count = User.objects.count() 
+    question_count = Question.objects.count()
+    exam = Exam.objects.all()
+    exam_count = Exam.objects.count()
+    return render(request, 'student_dashboard.html', {'exam_count':exam_count,'subject_count':subject_count,'student_count':student_count,'question_count':question_count,'exam':exam})
+
+@login_required(login_url='login')
+def take_exam_view(request):
+    # course=QMODEL.Course.objects.get(id=pk)
+    # total_questions=QMODEL.Question.objects.all().filter(course=course).count()
+    # questions=QMODEL.Question.objects.all().filter(course=course)
+    # total_marks=0
+    # for q in questions:
+    #     total_marks=total_marks + q.marks
+    return render(request, 'take-exam.html')
+
+def start_exam_view(request):
+    exam = Exam.objects.all()
+    attempt = Attempt.objects.all()
+    queryset = Option.objects.all()
+    query_order = Option.objects.order_by('id')
+    paginator = Paginator(query_order, 1)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    question_id = request.POST.get('question_id')
+    selected = request.POST.get('1')
+    option = Option.objects.filter(id=question_id).first()
+    print(option)
+    if option is not None:
+        score = option.question.score
+        answer = option.answer
+        if Option.objects.filter(answer__contains=selected):
+            for i in attempt:
+                i.score += score
+                i.save()
+        else:
+            print(False)
+    else:
+        print('Option not found')
+
+
+    return render(request, 'start-exam.html', {'attempt': attempt,'exam': exam,'page_obj': page_obj,'queryset':queryset})
+
+
+
+
+
+def calculate_marks_view(request):
+    
+    return HttpResponseRedirect('student-dashboard')

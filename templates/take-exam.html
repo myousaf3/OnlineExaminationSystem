@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content%}
+<div class="container">
+	<div class="col-md-10 offset-md-1 mt-5">
+                <div class="jumbotron">
+                        <div class="card border-info">
+                            <div class="card-body text-default">
+            
+                                <h4 class="card-title">Exam Details :</h4>
+                                <p class="card-text">
+                                    </p><ul style="list-style:decimal;">
+                                        <li>Course : Database</li>
+                                        <li>Total Question : 2</li>
+                                        <li>Total Marks : 15</li>
+                                    </ul>
+                                <p></p>
+            
+            
+            
+                                <h4 class="card-title">Rules :</h4>
+                                <p class="card-text">
+                                    </p><ul style="list-style:decimal;">
+                                        <li>All questions are MCQ (multiple choice question)</li>
+                                        <li><span class="text-danger">Only one choice is correct among the given.</span></li>
+                                        <li>Every question carry different marks.</li>
+                                        <li>Try to answer ASAP.</li>
+                                        <li>If you PRESS refresh or go back to the previous page, there will be a new question for you and the question you were on will be counted as number of attempts.</li>
+                                        <li>Questions are presented randomly.</li>
+                                        <li>You will be able to view marks immediately once after you submit the answer.</li>
+                                    </ul>
+                                <p></p>
+                                <a href="/student/start-exam/" class="btn btn-success" style="border-radius:0px;">Enter Examination</a>
+                            </div>  
+                            <div class="card-footer">Best Of Luck, Students!</div>  
+                        </div>  
+                </div>
+            </div>
+    </div>
+</div>
+
+
+{% endblock content%}

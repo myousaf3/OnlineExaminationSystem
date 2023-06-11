@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+<div class="container">
+    <div class="col-md-10 offset-md-1 mt-5">
+        <div class="jumbotron">
+            <h1 class="display-4 m-3 text-center">Student Dashboard</h1>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-md-4 col-xl-4">
+                    <div class="card bg-c-gtx order-card">
+                        <div class="card-block">
+                            <h6 class="m-b-20 text-center">Registered Students </h6>
+                            <h2 class="text-center"><i class="fas fa-user-graduate f-left"></i><span>
+                                    {{student_count}}</span>
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-xl-4">
+                    <div class="card bg-c-yellow order-card">
+                        <div class="card-block">
+                            <h6 class="m-b-20 text-center">Total Exams</h6>
+                            <h2 class="text-center"><i class="fas fa-book f-left"></i><span> {{exam_count}}</span>
+                            </h2>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-xl-4">
+                    <div class="card bg-c-blue order-card">
+                        <div class="card-block">
+                            <h6 class="m-b-20 text-center">Total Questions</h6>
+                            <h2 class="text-center"><i class="fas fa-question-circle f-left"></i><span>
+                                    {{question_count}}</span>
+                            </h2>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h1 class="display-6 m-3 text-center">Available Exams</h1>
+            <hr class="my-4">
+            <div class="container">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h6 class="panel-title">Available Exams</h6>
+                    </div>
+                    <table class="table table-hover table-bordered" id="dev-table">
+                        <thead>
+                            <tr>
+
+                                <th>Exam Name</th>
+
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for exams in exam %}
+                            <tr>
+                                <td>{{ exams.subject.name }}</td>
+                                <td><a class="btn btn-success btn-sm" style="border-radius:0px;"
+                                    href="/student/take-exam/"><span class="glyphicon glyphicon-check"></span>
+                                    Attend Exam</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h6 class="panel-title">My Marks</h6>
+                    </div>
+                    <table class="table table-hover table-bordered" id="dev-table">
+                        <thead>
+                            <tr>
+
+                                <th>Course</th>
+
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% if exams %}
+                            {% for exam in exams %}
+                            <tr>
+                                <td>{{ exam.id }}</td>
+                                <td>{{ exam }}</td>
+                                <td>{{ exam.questions_count }}</td>
+                                <td>{{ exam.is_approved }}</td>
+                                <td><a class="btn btn-primary btn-xs" value="{{exam}}" style="border-radius: 0%;"
+                                        href="{%url 'question' exam.subject.name%}"><span
+                                            class="glyphicon glyphicon-trash">View Questions</span></a></td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <p>No Subject found.</p>
+                            {% endif %}
+                            
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock content%}
