@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content%}
+<div class="container">
+    <div class="col-md-10 offset-md-1 mt-5">
+        <div class="jumbotron">
+            <h1 class="display-4 ">Admin Dashboard</h1>
+            <hr class="my-4">
+            <table class="table table-hover table-bordered" id="dev-table">
+                <thead>
+                    <tr>
+                        <th>Exam ID</th>
+                        <th>Teacher Name</th>
+                        <th>Subject</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam in exams %}
+                    <tr>
+                        <td>{{ exam.id }}</td>
+                        <td>{{ exam.teacher }}</td>
+                        <td>{{ exam.subject }}</td>
+                        <td>{{ exam.start_time }}</td>
+                        <td>{{ exam.end_time }}</td>
+                        <td>
+                            {% if exam.approved %}
+                            Approved
+                            {% elif exam.cancelled %}
+                            Cancelled
+                            {% else %}
+                            Pending Approval
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not exam.approved %}
+                            <form action="{% url 'approve_exam' exam.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">Approve</button>
+                            </form>
+                            {% endif %}
+                            {% if not exam.cancelled %}
+                            <form action="{% url 'cancel_exam' exam.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Cancel</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock content%}

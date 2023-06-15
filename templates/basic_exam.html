@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+	<div class="col-md-10 offset-md-1 mt-5">
+		<div class="jumbotron">
+			<h1>Take Exam: {{ exam.subject }}</h1>
+            <form method="post">
+                {% csrf_token %}
+                {% for question in questions %}
+                <div>
+                    <label>{{ question.question_text }}</label>
+                    {% for option in question.option_set.all %}
+                    <div>
+                        <input type="{{ question.question_type }}" name="question-{{ question.id }}" value="{{ option.id }}" id="option{{ option.id }}">
+                        <label for="option{{ option.id }}">
+                            {{ option.option1 }}
+                            {% if option.option2 %}, {{ option.option2 }}
+                            {% endif%}
+                            {% if option.option3 %}, {{ option.option3 }}
+                            {% endif %}
+                            {% if option.option4 %}, {{ option.option4}}
+                            {% endif %}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+	<div class="col-md-10 offset-md-1 mt-5">
+		<div class="jumbotron">
+			<h1>Take Exam: {{ exam.subject }}</h1>
+            <form method="post">
+                {% csrf_token %}
+                {% for question in questions %}
+                <div>
+                    <label>{{ question.question_text }}</label>
+                    {% for option in question.option_set.all %}
+                    <div>
+                        <!-- <input type="{{ question.question_type }}" name="question-{{ question.id }}" value="{{ option.id }}" id="option{{ option.id }}"> -->
+                        <label for="option{{ option.id }}">
+                            <div class="form-check mx-4">
+                                <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ option.option1 }}"
+                                    value="1">
+                                <label class="form-check-label" for="option1">
+                                    {{ option.option1}}
+                                </label>
+                            </div>
+                            <div class="form-check mx-4">
+                                <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ option.option2  }}"
+                                    value="1">
+                                <label class="form-check-label" for="option2">
+                                    {{ option.option2}}
+                                </label>
+                            </div>
+                            <div class="form-check mx-4">
+                                <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ option.option3 }}"
+                                    value="1">
+                                <label class="form-check-label" for="option3">
+                                    {{ option.option3}}
+                                </label>
+                            </div>
+                            <div class="form-check mx-4">
+                                <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ option.option4 }}"
+                                    value="1">
+                                <label class="form-check-label" for="option4">
+                                    {{ option.option4}}
+                                </label>
+                            </div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

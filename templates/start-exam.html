@@ -1,82 +1,93 @@
 {% extends 'base.html' %}
 
 {% block content%}
-
+{{exam_id}}
 {{request.POST}}
-{% for obj in attempt %}
-{{obj.score}}
-{% endfor %}
-
 <div class="container">
     <div class="col-md-10 offset-md-1 mt-5">
         <div class="jumbotron my-4">
             {% for obj in page_obj %}
-            <h2 style="text-align: center;">Exam: {{obj.question.exam}}</h2>
+            <h2 style="text-align: center;">Exam: {{exam_id}}</h2>
             {% endfor %}
-            <form class="form" method="POST">
-                {% csrf_token %}
-                {% for obj in page_obj %}
-                <h3 class="text-danger">Question{{ obj.id }}: {{ obj }}</h3>
-                <input type="hidden" name="question_id" value="{{ obj.id }}">
-                <h4 style="text-align: left;">[{{ obj.question.score}} Marks]</h4>
-                {% endfor %}
-
-                {% for obj in page_obj %}
-                <div class="form-check mx-4">
-                    <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ obj.option1 }}"
-                        value="1">
-                    <label class="form-check-label" for="option1">
-                        {{ obj.option1 }}
-                    </label>
-                </div>
-                {% endfor %}
-
-                {% for obj in page_obj %}
-                <div class="form-check mx-4">
-                    <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ obj.option2 }}"
-                        value="2">
-                    <label class="form-check-label" for="option2">
-                        {{ obj.option2 }}
-                    </label>
-                </div>
-                {% endfor %}
-
-                {% for obj in page_obj %}
-                <div class="form-check mx-4">
-                    <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ obj.option3 }}"
-                        value="3">
-                    <label class="form-check-label" for="option3">
-                        {{ obj.option3 }}
-                    </label>
-                </div>
-                {% endfor %}
-
-                {% for obj in page_obj %}
-                <div class="form-check mx-4">
-                    <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ obj.option4 }}"
-                        value="4">
-                    <label class="form-check-label" for="option4">
-                        {{ obj.option4 }}
-                    </label>
-                </div>
-                {{ obj.answer }}
-                {% endfor %}
-                <br>
-                <div class="pagination">
-                    <span class="step-links">
-                        <span class="current-page">
-                            Question {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            {% for question in page_obj %}
+            {% if question.question_type == "multiple_choice" %}
+                <form class="form" method="POST" action="?page={{ page_obj.number }}">
+                    {% csrf_token %}
+                    <div>
+                        <label>{{ question.question_text }}</label>
+                            <input type="hidden" name="question_id" value="{{ question.id }}" id="option{{ question.id }}">
+                        {% for option in question.option_set.all %}
+                        <div>
+                            <input type="hidden" name="option_id" value="{{ option.id }}" id="option{{ option.id }}">
+                            <label for="option{{ option.id }}">
+                                <div class="form-check mx-4">
+                                    <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ option.option1 }}"
+                                        value="1" required>
+                                    <label class="form-check-label" for="option1">
+                                        {{ option.option1}}
+                                    </label>
+                                </div>
+                                <div class="form-check mx-4">
+                                    <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ option.option2  }}"
+                                        value="2" required>
+                                    <label class="form-check-label" for="option2">
+                                        {{ option.option2}}
+                                    </label>
+                                </div>
+                                <div class="form-check mx-4">
+                                    <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ option.option3 }}"
+                                        value="3" required>
+                                    <label class="form-check-label" for="option3">
+                                        {{ option.option3}}
+                                    </label>
+                                </div>
+                                <div class="form-check mx-4">
+                                    <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ option.option4 }}"
+                                        value="4" required>
+                                    <label class="form-check-label" for="option4">
+                                        {{ option.option4}}
+                                    </label>
+                                </div>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <br>
+                    <div class="pagination">
+                        <span class="step-links">
+                            <span class="current-page">
+                                Question {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                            </span>
                         </span>
-                        {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}">next &rsaquo;</a>
-                        {% endif %}
-                    </span>
-                </div>
-                <br>
-                <input class="btn btn-success btn-lg" style="border-radius: 0%;" type="submit" value="Submit">
-            </form>
+                    </div>
+                    <br>
+                    {% if page_obj.number == page_obj.paginator.num_pages %}
+                    <input name="attempt_completed" type="hidden" value="{{True}}">
+                    {% endif %}
+                    <button name="exam_button" class="btn btn-success btn-lg" type="submit" value="Submit">Submit &rsaquo;</button>
+                </form>
+            {% else %}
+                <form class="form" method="POST" action="?page={{ page_obj.number }}">
+                    {% csrf_token %}
+                    <input type="hidden" name="question_id" value="{{ question.id }}">
+                    <label>{{ question.question_text }}</label>
+                    <br>
+                    <textarea name="answer"></textarea>
+                    <br>
+                    <br>
+                    {% if page_obj.number == page_obj.paginator.num_pages %}
+                    <input name="attempt_completed" type="hidden" value="{{True}}">
+                    {% endif %}
+                    <button name="exam_button" class="btn btn-success btn-lg" type="submit" value="Submit">Submit</button>
+                </form>
+            {% endif %}
+            {% endfor %}
+
         </div>
     </div>
 </div>
+{% for question in questions %}
+    {{question}}
+{% endfor%}
 
 {% endblock content%}
