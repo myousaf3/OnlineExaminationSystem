@@ -55,9 +55,14 @@
               </tr>
             </thead>
             <tbody>
-              {% for exams in exam %}
+              {% for exams in visible_exams %}
               <tr>
-                <td>{{ exams.subject.name }}</td>
+                <td>
+                  {{ exams.subject.name }}
+                  {% if exams.start_time > now %}
+                  <p>This exam starts at {{ exams.start_time|date:"F j, Y H:i" }}.</p>
+                </td>
+                {% else %}
                 <td>
                   <a
                     class="btn btn-success btn-sm"
@@ -67,6 +72,7 @@
                     Attend Exam
                   </a>
                 </td>
+                {% endif %}
               </tr>
               {% endfor %}
             </tbody>
@@ -106,4 +112,5 @@
     </div>
   </div>
 </div>
+
 {% endblock content%}

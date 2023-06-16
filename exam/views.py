@@ -27,7 +27,7 @@ from exam.models import (
     TempSessionScore,
 )
 from django.db.models import Q
-
+from django.utils import timezone
 
 def signup(request):
     form = SignUpForm(request.POST)
@@ -84,6 +84,7 @@ def approve_exam(request, exam_id):
     if request.method == "POST" and request.user.is_superuser:
         exam = Exam.objects.get(id=exam_id)
         exam.is_approved = True
+        exam.is_requested = False
         exam.save()
         return redirect("exam_list")
     else:
@@ -214,10 +215,16 @@ def student_view(request):
     student_count = User.objects.count()
     question_count = Question.objects.count()
     exam_count = Exam.objects.count()
+    now = timezone.now()
+    upcoming_exams = Exam.objects.filter(start_time__gt=now)
+    visible_exams = Exam.objects.filter(is_visible=True)
     return render(
         request,
         "student_dashboard.html",
         {
+            "upcoming_exams": upcoming_exams,
+            "visible_exams": visible_exams,
+            "now": now,
             "profile": profile,
             "attempts": attempts,
             "exam_count": exam_count,

@@ -1,6 +1,7 @@
 from django.db import models
+from django.utils import timezone
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
-import cloudinary
 from cloudinary.models import CloudinaryField
 
 
@@ -38,9 +39,19 @@ class Exam(models.Model):
     end_time = models.DateTimeField(null=True, blank=True)
     is_approved = models.BooleanField(default=False)
     is_requested = models.BooleanField(default=False)
+    is_visible = models.BooleanField(default=False)
 
     def __str__(self):
         return self.subject.name
+
+    def update_visibility(self):
+        now = timezone.now()
+        if self.is_approved and self.start_time > now:
+            self.is_visible = True
+
+    def save(self, *args, **kwargs):
+        self.update_visibility()
+        super().save(*args, **kwargs)
 
 
 class Question(models.Model):
@@ -71,7 +82,7 @@ class Option(models.Model):
         blank=True,
     )
     text_answer = models.CharField(max_length=100, null=True, blank=True)
-    
+
     def __str__(self):
         return self.question.question_text
 
