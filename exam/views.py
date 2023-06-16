@@ -29,6 +29,7 @@ from exam.models import (
 from django.db.models import Q
 from django.utils import timezone
 
+
 def signup(request):
     form = SignUpForm(request.POST)
     if form.is_valid():
@@ -273,7 +274,9 @@ def start_exam_view(request, exam_id):
         answer = str(option.answer)
         print("answer", answer)
         if text_answer is not None:
-            opt_answer = Option.objects.filter(Q(text_answer__icontains=request.POST['answer']))
+            opt_answer = Option.objects.filter(
+                Q(text_answer__icontains=request.POST["answer"])
+            )
             if opt_answer.exists():
                 print("i am here hehehe")
                 temp_score.score += score
@@ -386,8 +389,7 @@ def start_exam_view(request, exam_id):
 def check_exam_view(request, exam_id):
     user = request.user
     attempted_questions = AttemptQuestion.objects.filter(
-        student=user,
-        question__exam_id=exam_id
+        student=user, question__exam_id=exam_id
     )
     attempt_score = get_object_or_404(Attempt, student=user, exam_id=exam_id)
     return render(
@@ -399,40 +401,3 @@ def check_exam_view(request, exam_id):
             "attempted_questions": attempted_questions,
         },
     )
-
-
-def take_exam(request, exam_id):
-    exam = Exam.objects.get(id=exam_id)
-    questions = Question.objects.filter(exam=exam)
-    question_scores = Question.objects.filter(exam=exam).values_list("score", flat=True)
-    print(questions)
-
-    # write a score queryset here
-    if request.method == "POST":
-        # Create a new attempt for the logged in user and the current exam
-        attempt = Attempt.objects.create(exam=exam, score=question_scores)
-
-        # Loop through all questions in the exam
-        for question in questions:
-            # Get the selected option from the form data
-            selected_option_id = request.POST.get(f"question-{question.id}")
-
-            # Create a new AttemptQuestion instance for the current question and selected option
-            attempt_question = AttemptQuestion.objects.create(
-                student=request.user,
-                attempt=attempt,
-                question=question,
-                selected_option=Option.objects.get(id=selected_option_id),
-            )
-
-        return redirect("/exam-submission", attempt_id=attempt.id)
-
-    context = {
-        "exam": exam,
-        "questions": questions,
-    }
-    return render(request, "basic_exam.html", context)
-
-
-def calculate_marks_view(request):
-    return HttpResponseRedirect("student-dashboard")
