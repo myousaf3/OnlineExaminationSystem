@@ -71,9 +71,7 @@ def is_student(user):
 
 
 def home(request):
-    if request.user.is_authenticated:
-        context = {}
-    return render(request, "home.html", context)
+    return render(request, "home.html")
 
 
 def signup(request):
