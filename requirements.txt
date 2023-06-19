@@ -1,6 +1,7 @@
 asgiref==3.7.2
 certifi==2023.5.7
 cloudinary==1.33.0
+dj-database-url==2.0.0
 Django==4.2.2
 django-crispy-forms==2.0
 Pillow==9.5.0
