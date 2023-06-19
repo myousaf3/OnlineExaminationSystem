@@ -71,9 +71,7 @@ def is_student(user):
 
 
 def home(request):
-    if request.user.is_authenticated:
-        context = {}
-    return render(request, "home.html", context)
+    return render(request, "home.html")
 
 
 def signup(request):
@@ -94,7 +92,7 @@ def signup(request):
                 raise Exception("User cannot be authenticated")
 
     except Exception as e:
-        context["error"] = str(e)
+        context = {"form": form, "error": str(e)}
 
     return render(request, "signup.html", context)
 
@@ -222,6 +220,8 @@ def exam_submission(request):
         student_count = User.objects.count()
         question_count = Question.objects.count()
         exams = Exam.objects.annotate(question_count=Count("question"))
+        exam = Exam.objects.filter(is_approved=True)
+        attempts = Attempt.objects.filter(exam__in=exam)
         questions = Question.objects.all()
 
         if "request-btn" in request.POST:
@@ -237,6 +237,7 @@ def exam_submission(request):
             request,
             "exam-submission.html",
             {
+                "attempts": attempts,
                 "subjects": subjects,
                 "subject_count": subject_count,
                 "student_count": student_count,
