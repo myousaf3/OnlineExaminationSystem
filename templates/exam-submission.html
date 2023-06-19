@@ -119,6 +119,28 @@
               {% endif %}
             </tbody>
           </table>
+          <hr class="my-4">
+            <h2>Outcome of Student Exams</h2>
+            <table class="table table-hover table-bordered" id="dev-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Exam</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if attempts %} {% for attempt in attempts %}
+                    <tr>
+                        <td>{{ attempt.student.get_full_name }}</td>
+                        <td>{{ attempt.exam }}</td>
+                        <td>{{ attempt.score }}</td>
+                    </tr>
+                    {% endfor %} {% else %}
+                        <p class='text-danger'>No Outcome found.</p>
+                    {% endif %}
+                </tbody>
+            </table>
         </div>
       </div>
     </div>

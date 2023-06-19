@@ -71,7 +71,6 @@
                         <th>Name</th>
                         <th>Exam</th>
                         <th>Score</th>
-                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -80,14 +79,6 @@
                         <td>{{ attempt.student.get_full_name }}</td>
                         <td>{{ attempt.exam }}</td>
                         <td>{{ attempt.score }}</td>
-                        <td>
-                            <a
-                                class="btn btn-success btn-sm"
-                                href="{%url 'check_exam' attempt.exam.id %}">
-                                <span class="glyphicon glyphicon-check"></span>
-                                Review
-                            </a>
-                        </td>
                     </tr>
                     {% endfor %} {% else %}
                         <p class='text-danger'>No requests found.</p>

@@ -34,7 +34,9 @@
         <a class="nav-link" href="{%url 'exam_list' %}">Admin</a>
       </li>
     </ul>
-
+{% if messages %} {% for message in messages %}
+  <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %} {% endif %}
     {% if user.is_authenticated %}
     <li class="nav-item">
       <a class="nav-link"Admin>Welcome, {{ user.username }}!</a>
