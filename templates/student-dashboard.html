@@ -3,25 +3,32 @@
 <div class="container">
   <div class="col-md-10 offset-md-1 mt-5">
     <div class="jumbotron">
-      <h1 class="display-4 m-3 text-center">Student Dashboard</h1>
+      <div class="row">
+        &nbsp &nbsp &nbsp &nbsp
+    <img src="{{ profile.profile_picture.url}}" style="border-radius: 50%;" width="9%">
+    <li class="nav-item">
+      <a class="display-4"Admin> &nbsp{{ user.username }}!</a>
+    </li>
+  </div>
+    <h1 class="display-4 m-3">Student Dashboard</h1>  
       <hr class="my-4" />
       <div class="row">
         <div class="col-md-4 col-xl-4">
           <div class="card bg-c-gtx order-card">
             <div class="card-block">
-              <h6 class="m-b-20 text-center">Registered Students</h6>
+              <h6 class="m-b-20 text-center mt-2"><b>Registered Students</b></h6>
               <h2 class="text-center">
                 <i class="fas fa-user-graduate f-left"></i
-                ><span> {{student_count}}</span>
-              </h2>
+                  ><span> {{student_count}}</span>
+                </h2>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div class="col-md-4 col-xl-4">
-          <div class="card bg-c-yellow order-card">
+          
+          <div class="col-md-4 col-xl-4">
+            <div class="card bg-c-yellow order-card">
             <div class="card-block">
-              <h6 class="m-b-20 text-center">Total Exams</h6>
+              <h6 class="m-b-20 text-center mt-2"><b>Total Exams</b></h6>
               <h2 class="text-center">
                 <i class="fas fa-book f-left"></i><span> {{exam_count}}</span>
               </h2>
@@ -32,20 +39,20 @@
         <div class="col-md-4 col-xl-4">
           <div class="card bg-c-blue order-card">
             <div class="card-block">
-              <h6 class="m-b-20 text-center">Total Questions</h6>
+              <h6 class="m-b-20 text-center mt-2"><b>Total Questions</b></h6>
               <h2 class="text-center">
                 <i class="fas fa-question-circle f-left"></i
-                ><span> {{question_count}}</span>
-              </h2>
+                  ><span> {{question_count}}</span>
+                </h2>
+              </div>
             </div>
-          </div>
         </div>
       </div>
       <hr class="my-4" />
       <div class="container">
         <div class="panel panel-primary">
           <div class="panel-heading">
-            <h1 class="display-6 m-3 text-center">Available Exams</h1>
+            <h1 class="display-6 m-3">Available Exams</h1>
           </div>
           <table class="table table-hover table-bordered" id="dev-table">
             <thead>
@@ -55,7 +62,7 @@
               </tr>
             </thead>
             <tbody>
-              {% for exams in visible_exams %}
+              {% if visible_exams %} {% for exams in visible_exams %}
               <tr>
                 <td>
                   {{ exams.subject.name }}
@@ -74,7 +81,9 @@
                 </td>
                 {% endif %}
               </tr>
-              {% endfor %}
+              {% endfor %} {% else %}
+                <p class='text-danger'>No exam found.</p>
+              {% endif %} 
             </tbody>
           </table>
         </div>
@@ -82,7 +91,7 @@
       <div class="container">
         <div class="panel panel-primary">
           <div class="panel-heading">
-            <h1 class="display-6 m-3 text-center">My Marks</h1>
+            <h1 class="display-6 m-3">My Marks</h1>
           </div>
           <table class="table table-hover table-bordered" id="dev-table">
             <thead>
@@ -93,7 +102,7 @@
                 <th>View Exam</th>
               </tr>
             </thead>
-            {% for t in attempts %}
+            {% if attempts %} {% for t in attempts %}
             <tr>
               <td>{{t.exam}}</td>
               <td>{{t.score}}</td>
@@ -105,7 +114,9 @@
                 </a>
               </td>
             </tr>
-            {% endfor %}
+            {% endfor %} {% else %}
+                <p class='text-danger'>No marks found.</p>
+            {% endif %}
           </table>
         </div>
       </div>

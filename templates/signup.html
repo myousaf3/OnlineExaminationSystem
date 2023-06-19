@@ -7,8 +7,9 @@
 			<h1 class="display-4">Examination Registeration</h1>
             <hr class="my-4">
             <h2>Sign up</h2>
-            <form method="post" action="."> 
+            <form method="post"> 
                 {% csrf_token %} 
+                {{ signup_form.as_p }} 
                 {{ form.as_p }} 
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form> 

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+	<div class="col-md-10 offset-md-1 mt-5">
+		<div class="jumbotron">
+			<h1 class="display-4">Text-Based Questions</h1>
+            <hr class="my-4">
+            <ol>
+                <li>Start with a clear and concise question that is easy to understand.</li>
+                <li>Choose a format that works well with the content being discussed, such as fill-in-the-blank, short answer, or open-ended response.</li>
+                <li>Use appropriate grammar and spelling to ensure clarity and understanding.</li>
+                <li>Provide context or additional information when necessary to help the reader better understand the question.</li>
+                <li>Keep the language simple and avoid using technical jargon or complex vocabulary, unless it is essential to the question.</li>
+            </ol> 
+            <div class="col-md-4 col-xl">
+                <a
+                    href="{%url 'text-based' %}"
+                    style="text-decoration: none; color: rgb(0, 0, 0); padding: 5px"
+                >
+                    <div class="card bg-c-blue order-card">
+                    <div class="card-block">
+                        <h1 class="text-center mt-2" ><i class="fas fa-plus f-left"></i></h1>
+                        <h3 class="m-b-20 text-center">Create Text-Based Questions</h3>
+                    </div>
+                    </div>
+                </a>
+            </div>
+            <h1 class="display-4">Multiple-Choice Questions</h1>
+            <hr class="my-4">
+            <ol>
+                <li>Start with a clear and concise question stem that is easy to understand.</li>
+                <li>Keep the options consistent in length and structure to reduce confusion.</li>
+                <li>Avoid using negatives in your question or answer choices, as these can be confusing.</li>
+                <li>Use plausible distractors that will challenge the learner and accurately assess their knowledge of the topic.</li>
+                <li>Clearly indicate how many answer choices the learner is expected to select, such as "Select all that apply" or "Choose two options."</li>
+            </ol>
+            <div class="col-md-4 col-xl">
+                <a
+                    href="{%url 'mcq-based' %}"
+                    style="text-decoration: none; color: rgb(0, 0, 0); padding: 5px"
+                >
+                    <div class="card bg-c-blue order-card">
+                    <div class="card-block">
+                        <h1 class="text-center mt-2" ><i class="fas fa-plus f-left"></i></h1>
+                        <h3 class="m-b-20 text-center">Create Multiple-Choice Questions</h3>
+                    </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

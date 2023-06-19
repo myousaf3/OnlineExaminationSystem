@@ -5,15 +5,10 @@ from cloudinary.models import CloudinaryField
 
 
 class Profile(models.Model):
-    USER_TYPE_CHOICES = (
-        ("Admin", "Admin"),
-        ("Teacher", "Teacher"),
-        ("Student", "Student"),
-    )
-
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     user_type = models.CharField(
-        choices=USER_TYPE_CHOICES, max_length=10, null=True, blank=True
+        choices=[("teacher", "Teacher"), ("student", "Student")],
+        max_length=10,
     )
     profile_picture = CloudinaryField("image")
 
@@ -34,8 +29,8 @@ class Exam(models.Model):
     )
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name="exams")
     questions_count = models.PositiveIntegerField(default=0)
-    start_time = models.DateTimeField(null=True, blank=True)
-    end_time = models.DateTimeField(null=True, blank=True)
+    start_time = models.DateTimeField(default=timezone.now)
+    end_time = models.DateTimeField(default=timezone.now)
     is_approved = models.BooleanField(default=False)
     is_requested = models.BooleanField(default=False)
     is_visible = models.BooleanField(default=False)
@@ -58,11 +53,11 @@ class Question(models.Model):
     subject = models.ForeignKey(
         Subject, on_delete=models.CASCADE, null=True, blank=True
     )
-    score = models.PositiveIntegerField(null=True, blank=True)
+    score = models.PositiveIntegerField(default=0)
     question_text = models.TextField()
     question_type = models.CharField(
         choices=[("multiple_choice", "Multiple Choice"), ("text_based", "Text Based")],
-        max_length=20,
+        max_length=100,
     )
 
     def __str__(self):

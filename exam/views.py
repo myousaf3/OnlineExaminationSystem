@@ -1,12 +1,15 @@
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from django.contrib.auth.models import User, Group
 from django.core.paginator import Paginator
+from django.core.mail import send_mail
+from django.db.models import Count
 from django.shortcuts import (
     render,
     redirect,
-    HttpResponseRedirect,
     get_object_or_404,
+    HttpResponse,
 )
 from .forms import (
     SignUpForm,
@@ -14,6 +17,9 @@ from .forms import (
     ExamForm,
     QuestionForm,
     OptionForm,
+    TextForm,
+    GroupForm,
+    ProfileForm,
 )
 from exam.models import (
     Question,
@@ -30,13 +36,49 @@ from django.db.models import Q
 from django.utils import timezone
 
 
+def create_profile(request):
+    # Check if the user already has a profile
+    try:
+        existing_profile = request.user.profile
+    except Profile.DoesNotExist:
+        existing_profile = None
+
+    if request.method == "POST":
+        form = ProfileForm(request.POST, request.FILES, instance=existing_profile)
+        if form.is_valid():
+            # Save the updated or new profile object
+            profile = form.save(commit=False)
+            profile.user = request.user
+            profile.save()
+            return redirect("home")
+    else:
+        form = ProfileForm(instance=existing_profile)
+    return render(request, "create_profile.html", {"form": form})
+
+
+def is_teacher(user):
+    return user.groups.filter(name="Teacher").exists()
+
+
+def is_student(user):
+    return user.groups.filter(name="Student").exists()
+
+
+def home(request):
+    if request.user.is_authenticated:
+        context = {}
+    return render(request, "home.html", context)
+
+
 def signup(request):
     form = SignUpForm(request.POST)
     if form.is_valid():
         username = form.cleaned_data.get("username")
-        password = form.cleaned_data.get("password")
+        password = form.cleaned_data.get("password1")
         form.save()
-        return redirect("login")
+        user = authenticate(username=username, password=password)
+        login(request, user)
+        return redirect("create_profile")
     context = {"form": form}
     return render(request, "signup.html", context)
 
@@ -50,7 +92,7 @@ def user_login(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect("exam_submission")
+                return redirect("home")
             else:
                 messages.error(request, "Invalid credentials")
     else:
@@ -75,7 +117,29 @@ def profile(request):
 def exam_list(request):
     if request.user.is_superuser:
         exams = Exam.objects.filter(is_requested=True)
-        return render(request, "admin/exam_list.html", {"exams": exams})
+        exam = Exam.objects.filter(is_approved=True)
+        attempts = Attempt.objects.filter(exam__in=exam)
+        form = GroupForm(request.POST)
+        if form.is_valid():
+            user = form.cleaned_data["user"]
+            group = form.cleaned_data["group"]
+            user = user  # Or get the desired user object
+            send_mail(
+                "Testing Mail",
+                f"Your username: {user} has been registered in the for along with your Email ID: {user.email} as {group}",
+                "yousaf.munawar@gmail.com",
+                {user.email},
+                fail_silently=False,
+            )
+            user.groups.add(group)
+            return redirect("exam_list")
+        else:
+            form = GroupForm()
+        return render(
+            request,
+            "admin/exam_list.html",
+            {"form": form, "attempts": attempts, "exams": exams},
+        )
     else:
         return render(request, "admin/access_denied.html")
 
@@ -104,38 +168,26 @@ def cancel_exam(request, exam_id):
 
 
 @login_required(login_url="login")
+@user_passes_test(is_teacher)
 def exam_submission(request):
     subjects = Subject.objects.all()
     subject_count = Subject.objects.count()
     student_count = User.objects.count()
     question_count = Question.objects.count()
-    exams = Exam.objects.all()
+    exams = Exam.objects.annotate(question_count=Count("question"))
     questions = Question.objects.all()
-    if request.method == "POST":
-        question_form = QuestionForm(request.POST)
-        option_form = OptionForm(request.POST)
-        if question_form.is_valid() and option_form.is_valid():
-            question = question_form.save()
-            option = option_form.save(commit=False)
-            option.question = question
-            option.save()
-        if "request-btn" in request.POST:
-            if Exam.objects.filter(is_requested=True).exists():
-                messages.warning(request, "Exam request already exists.")
-            else:
-                exam_id = request.POST.get("exam_id")
-                exam = Exam.objects.get(id=exam_id)
-                exam.is_requested = True
-                exam.save()
-    else:
-        question_form = QuestionForm()
-        option_form = OptionForm()
+    if "request-btn" in request.POST:
+        if Exam.objects.filter(is_requested=True).exists():
+            messages.warning(request, "Exam request already exists.")
+        else:
+            exam_id = request.POST.get("exam_id")
+            exam = Exam.objects.get(id=exam_id)
+            exam.is_requested = True
+            exam.save()
     return render(
         request,
-        "exam_submission.html",
+        "exam-submission.html",
         {
-            "question_form": question_form,
-            "option_form": option_form,
             "subjects": subjects,
             "subject_count": subject_count,
             "student_count": student_count,
@@ -147,11 +199,12 @@ def exam_submission(request):
 
 
 @login_required(login_url="login")
+@user_passes_test(is_teacher)
 def create_exam(request):
     if request.method == "POST":
         exam_form = ExamForm(request.POST)
         if exam_form.is_valid():
-            exam = exam_form.save(commit=False)
+            exam = exam_form.save()
             exam.teacher = request.user
             existing_exam = Exam.objects.filter(
                 subject=exam.subject,
@@ -164,10 +217,11 @@ def create_exam(request):
                 return redirect("/exams/create", pk=exam.pk)
     else:
         exam_form = ExamForm()
-    return render(request, "create_exam.html", {"exam_form": exam_form})
+    return render(request, "create-exam.html", {"exam_form": exam_form})
 
 
 @login_required(login_url="login")
+@user_passes_test(is_teacher)
 def delete_question(request, pk):
     question = get_object_or_404(Question, pk=pk)
     exam_pk = question.exam.pk  # get the pk of the related Exam instance
@@ -178,6 +232,7 @@ def delete_question(request, pk):
 
 
 @login_required(login_url="login")
+@user_passes_test(is_teacher)
 def question_view(request, name):
     subject_count = Subject.objects.count()
     student_count = User.objects.count()
@@ -195,7 +250,7 @@ def question_view(request, name):
 
     return render(
         request,
-        "question_view.html",
+        "question-view.html",
         {
             "my_param": my_param,
             "subject_count": subject_count,
@@ -206,6 +261,7 @@ def question_view(request, name):
 
 
 @login_required(login_url="login")
+@user_passes_test(is_student)
 def student_view(request):
     profile = request.user.profile
     attempts = Attempt.objects.filter(student=request.user)
@@ -221,7 +277,7 @@ def student_view(request):
     visible_exams = Exam.objects.filter(is_visible=True)
     return render(
         request,
-        "student_dashboard.html",
+        "student-dashboard.html",
         {
             "upcoming_exams": upcoming_exams,
             "visible_exams": visible_exams,
@@ -238,11 +294,12 @@ def student_view(request):
 
 
 @login_required(login_url="login")
-def take_exam_view(request):
-    return render(request, "take-exam.html")
+def questions_take(request):
+    return render(request, "questions-take.html")
 
 
 @login_required(login_url="login")
+@user_passes_test(is_student)
 def start_exam_view(request, exam_id):
     profile = request.user.profile
     print(request.POST)
@@ -386,6 +443,7 @@ def start_exam_view(request, exam_id):
 
 
 @login_required(login_url="login")
+@user_passes_test(is_student)
 def check_exam_view(request, exam_id):
     user = request.user
     attempted_questions = AttemptQuestion.objects.filter(
@@ -399,5 +457,75 @@ def check_exam_view(request, exam_id):
             "exam_id": exam_id,
             "attempt_score": attempt_score,
             "attempted_questions": attempted_questions,
+        },
+    )
+
+
+@login_required(login_url="login")
+@user_passes_test(is_teacher)
+def mcq_based(request):
+    if request.method == "POST":
+        question_form = QuestionForm(request.POST)
+        option_form = OptionForm(request.POST)
+        if question_form.is_valid() and option_form.is_valid():
+            question = question_form.save(commit=False)
+            question.question_type = "multiple_choice"
+            question.subject = question.exam.subject
+            question.save()
+            option = option_form.save(commit=False)
+            option.question = question
+            option.save()
+        if "request-btn" in request.POST:
+            if Exam.objects.filter(is_requested=True).exists():
+                messages.warning(request, "Exam request already exists.")
+            else:
+                exam_id = request.POST.get("exam_id")
+                exam = Exam.objects.get(id=exam_id)
+                exam.is_requested = True
+                exam.save()
+    else:
+        question_form = QuestionForm()
+        option_form = OptionForm()
+    return render(
+        request,
+        "mcq-based.html",
+        {
+            "question_form": question_form,
+            "option_form": option_form,
+        },
+    )
+
+
+@login_required(login_url="login")
+@user_passes_test(is_teacher)
+def text_based(request):
+    if request.method == "POST":
+        question_form = QuestionForm(request.POST)
+        text_form = TextForm(request.POST)
+        if question_form.is_valid() and text_form.is_valid():
+            question = question_form.save(commit=False)
+            question.question_type = "text_based"
+            question.subject = question.exam.subject
+            question.save()
+            text = text_form.save(commit=False)
+            text.question = question
+            text.save()
+        if "request-btn" in request.POST:
+            if Exam.objects.filter(is_requested=True).exists():
+                messages.warning(request, "Exam request already exists.")
+            else:
+                exam_id = request.POST.get("exam_id")
+                exam = Exam.objects.get(id=exam_id)
+                exam.is_requested = True
+                exam.save()
+    else:
+        question_form = QuestionForm()
+        text_form = TextForm()
+    return render(
+        request,
+        "text-based.html",
+        {
+            "question_form": question_form,
+            "text_form": text_form,
         },
     )
