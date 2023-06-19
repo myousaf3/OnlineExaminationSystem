@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+<div class="container">
+    <div class="col-md-10 offset-md-1 mt-5">
+        <div class="jumbotron my-4">
+            {% for obj in page_obj %}
+            <h2 style="text-align: center;">Exam: {{exam_id}}</h2>
+            {% endfor %}
+            {% for question in page_obj %}
+            {% if question.question_type == "multiple_choice" %}
+                <form class="form" method="POST" action="?page={{ page_obj.number }}">
+                    {% csrf_token %}
+                    <div>
+                        <label>{{ question.question_text }}</label>
+                            <input type="hidden" name="question_id" value="{{ question.id }}" id="option{{ question.id }}">
+                        {% for option in question.option_set.all %}
+                        <div>
+                            <input type="hidden" name="option_id" value="{{ option.id }}" id="option{{ option.id }}">
+                            <label for="option{{ option.id }}">
+                                <div class="form-check mx-4">
+                                    <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ option.option1 }}"
+                                        value="1" required>
+                                    <label class="form-check-label" for="option1">
+                                        {{ option.option1}}
+                                    </label>
+                                </div>
+                                <div class="form-check mx-4">
+                                    <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ option.option2  }}"
+                                        value="2" required>
+                                    <label class="form-check-label" for="option2">
+                                        {{ option.option2}}
+                                    </label>
+                                </div>
+                                <div class="form-check mx-4">
+                                    <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ option.option3 }}"
+                                        value="3" required>
+                                    <label class="form-check-label" for="option3">
+                                        {{ option.option3}}
+                                    </label>
+                                </div>
+                                <div class="form-check mx-4">
+                                    <input class="form-check-input" type="radio" name="{{ forloop.counter }}" id="{{ option.option4 }}"
+                                        value="4" required>
+                                    <label class="form-check-label" for="option4">
+                                        {{ option.option4}}
+                                    </label>
+                                </div>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <br>
+                    <div class="pagination">
+                        <span class="step-links">
+                            <span class="current-page">
+                                Question {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                            </span>
+                        </span>
+                    </div>
+                    <br>
+                    {% if page_obj.number == page_obj.paginator.num_pages %}
+                    <input name="attempt_completed" type="hidden" value="{{True}}">
+                    {% endif %}
+                    <button name="exam_button" class="btn btn-success btn-lg" type="submit" value="Submit">Submit &rsaquo;</button>
+                </form>
+            {% else %}
+                <form class="form" method="POST" action="?page={{ page_obj.number }}">
+                    {% csrf_token %}
+                    <input type="hidden" name="question_id" value="{{ question.id }}">
+                    <label>{{ question.question_text }}</label>
+                    <br>
+                    <textarea name="answer"></textarea>
+                    <br>
+                    <br>
+                    {% if page_obj.number == page_obj.paginator.num_pages %}
+                    <input name="attempt_completed" type="hidden" value="{{True}}">
+                    {% endif %}
+                    <button name="exam_button" class="btn btn-success btn-lg" type="submit" value="Submit">Submit</button>
+                </form>
+            {% endif %}
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+{% endblock content%}

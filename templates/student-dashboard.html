@@ -1,0 +1,127 @@
+{% extends 'base.html' %} {% block content%}
+
+<div class="container">
+  <div class="col-md-10 offset-md-1 mt-5">
+    <div class="jumbotron">
+      <div class="row">
+        &nbsp &nbsp &nbsp &nbsp
+    <img src="{{ profile.profile_picture.url}}" style="border-radius: 50%;" width="9%">
+    <li class="nav-item">
+      <a class="display-4"Admin> &nbsp{{ user.username }}!</a>
+    </li>
+  </div>
+    <h1 class="display-4 m-3">Student Dashboard</h1>  
+      <hr class="my-4" />
+      <div class="row">
+        <div class="col-md-4 col-xl-4">
+          <div class="card bg-c-gtx order-card">
+            <div class="card-block">
+              <h6 class="m-b-20 text-center mt-2"><b>Registered Students</b></h6>
+              <h2 class="text-center">
+                <i class="fas fa-user-graduate f-left"></i
+                  ><span> {{student_count}}</span>
+                </h2>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-4 col-xl-4">
+            <div class="card bg-c-yellow order-card">
+            <div class="card-block">
+              <h6 class="m-b-20 text-center mt-2"><b>Total Exams</b></h6>
+              <h2 class="text-center">
+                <i class="fas fa-book f-left"></i><span> {{exam_count}}</span>
+              </h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-xl-4">
+          <div class="card bg-c-blue order-card">
+            <div class="card-block">
+              <h6 class="m-b-20 text-center mt-2"><b>Total Questions</b></h6>
+              <h2 class="text-center">
+                <i class="fas fa-question-circle f-left"></i
+                  ><span> {{question_count}}</span>
+                </h2>
+              </div>
+            </div>
+        </div>
+      </div>
+      <hr class="my-4" />
+      <div class="container">
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h1 class="display-6 m-3">Available Exams</h1>
+          </div>
+          <table class="table table-hover table-bordered" id="dev-table">
+            <thead>
+              <tr>
+                <th>Exam Name</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if visible_exams %} {% for exams in visible_exams %}
+              <tr>
+                <td>
+                  {{ exams.subject.name }}
+                  {% if exams.start_time > now %}
+                  <p>This exam starts at {{ exams.start_time|date:"F j, Y H:i" }}.</p>
+                </td>
+                {% else %}
+                <td>
+                  <a
+                    class="btn btn-success btn-sm"
+                    href="{%url 'take_exam' exams.id%}"
+                  >
+                    <span class="glyphicon glyphicon-check"></span>
+                    Attend Exam
+                  </a>
+                </td>
+                {% endif %}
+              </tr>
+              {% endfor %} {% else %}
+                <p class='text-danger'>No exam found.</p>
+              {% endif %} 
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="container">
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h1 class="display-6 m-3">My Marks</h1>
+          </div>
+          <table class="table table-hover table-bordered" id="dev-table">
+            <thead>
+              <tr>
+                <th>Course</th>
+                <th>Score</th>
+                <th>Number of Attempts</th>
+                <th>View Exam</th>
+              </tr>
+            </thead>
+            {% if attempts %} {% for t in attempts %}
+            <tr>
+              <td>{{t.exam}}</td>
+              <td>{{t.score}}</td>
+              <td>Attempt {{ forloop.counter }}</td>
+              <td>
+                <a class="btn btn-success btn-sm" href="{%url 'check_exam' t.exam.id %}">
+                  <span class="glyphicon glyphicon-check"></span>
+                  Check
+                </a>
+              </td>
+            </tr>
+            {% endfor %} {% else %}
+                <p class='text-danger'>No marks found.</p>
+            {% endif %}
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content%}

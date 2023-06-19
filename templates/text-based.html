@@ -1,0 +1,18 @@
+{% extends 'base.html' %} {% block content%}
+<div class="container">
+  <div class="col-md-10 offset-md-1 mt-5">
+    <div class="jumbotron">
+      <h1 class="display-4">Text Based Exam</h1>
+      <hr class="my-4" />
+      <form
+        method="post"
+        autocomplete="off"
+        style="margin: 100px; margin-top: 0px"
+      >
+        {% csrf_token %} {{ question_form.as_p }} {{ text_form.as_p }}
+        <button class="btn btn-success btn-xs" type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content%}
