@@ -30,9 +30,15 @@ class SignUpForm(UserCreationForm):
             "password2",
         )
 
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email address is already in use.")
+        return email
+
 
 class GroupForm(forms.Form):
-    user = forms.ModelChoiceField(queryset=User.objects.all())
+    user = forms.ModelChoiceField(queryset=User.objects.filter(groups__isnull=True))
     group = forms.ModelChoiceField(queryset=Group.objects.all())
 
 

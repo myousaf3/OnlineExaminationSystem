@@ -16,27 +16,34 @@
 </head>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="/student-dashboard/">Examify</a>
+  <a class="navbar-brand" href="/">Examify</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-
+  
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" href="{%url 'exam_submission' %}">Teacher</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{%url 'student_dashboard' %}">Student</a>
-      </li>
+      {% if user.groups.all %}
+          {% for group in user.groups.all %}
+              {% if group.name == 'Teacher' %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{%url 'exam_submission' %}">Teacher</a>
+                  </li>
+              {% endif %}
+              {% if group.name == 'Student' %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{%url 'student_dashboard' %}">Student</a>
+                  </li>
+              {% endif %}
+          {% endfor %}
+      {% endif %}
+      {% if perms.auth.view_user %}
       <li class="nav-item">
         <a class="nav-link" href="{%url 'exam_list' %}">Admin</a>
       </li>
+      {% endif %}
     </ul>
-{% if messages %} {% for message in messages %}
-  <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-  {% endfor %} {% endif %}
     {% if user.is_authenticated %}
     <li class="nav-item">
       <a class="nav-link"Admin>Welcome, {{ user.username }}!</a>
@@ -50,6 +57,11 @@
 </nav>
 
 <body>
+      <div class="d-flex justify-content-center">
+      {% if messages %} {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %} {% endif %}
+    </div>
   {% block content%}
   {% endblock content%}
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
@@ -61,6 +73,17 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
     integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
     crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Auto-dismiss messages after 5 seconds (5000 milliseconds)
+      var alerts = document.querySelectorAll(".alert");
+      setTimeout(function () {
+        for (var i = 0; i < alerts.length; i++) {
+          alerts[i].remove();
+        }
+      }, 5000);
+    });
+  </script>
 </body>
 
 </html>
