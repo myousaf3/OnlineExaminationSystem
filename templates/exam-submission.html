@@ -86,36 +86,32 @@
             </thead>
 
             <tbody>
-              {% if exams %} {% for exam in exams %}
-              <tr>
-                <td>{{ exam }}</td>
-                <td>{{ exam.question_count }}</td>
-                <td>{{ exam.is_approved }}</td>
-                <td>
-                  <a
-                    class="btn btn-primary btn-xs"
-                    value="{{exam}}"
-                    href="{%url 'question' exam.subject.name%}"
-                  >
-                    <span class="glyphicon glyphicon-trash"
-                      >View Questions
-                    </span>
-                  </a>
-                  <form method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="exam_id" value="{{exam.id}}" />
-                    <button
-                      name="request-btn"
-                      class="btn btn-success btn-xs"
-                      type="submit"
-                    >
-                      <span class="glyphicon glyphicon-trash">Request </span>
-                    </button>
-                  </form>
-                </td>
-              </tr>
-              {% endfor %} {% else %}
-                <p class='text-danger'>No exam found.</p>
+              {% if exams %}
+                {% for exam in exams %}
+                  <tr>
+                    <td>{{ exam }}</td>
+                    <td>{{ exam.question_count }}</td>
+                    <td>{{ exam.is_approved }}</td>
+                    <td>
+                      <a class="btn btn-primary btn-xs" value="{{exam}}" href="{% url 'question' exam.subject.name %}">
+                        <span class="glyphicon glyphicon-trash">View Questions</span>
+                      </a>
+                      {% if not exam.is_approved %}
+                        <form method="POST">
+                          {% csrf_token %}
+                          <input type="hidden" name="exam_id" value="{{exam.id}}" />
+                          <button name="request-btn" class="btn btn-success btn-xs" type="submit">
+                            <span class="glyphicon glyphicon-trash">Request</span>
+                          </button>
+                        </form>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="4"><p class="text-danger">No exam found.</p></td>
+                </tr>
               {% endif %}
             </tbody>
           </table>
@@ -136,8 +132,11 @@
                         <td>{{ attempt.exam }}</td>
                         <td>{{ attempt.score }}</td>
                     </tr>
-                    {% endfor %} {% else %}
-                        <p class='text-danger'>No Outcome found.</p>
+                    {% endfor %} 
+                    {% else %}
+                        <tr>
+                          <td colspan="4"><p class="text-danger">No Outcome found.</p></td>
+                        </tr>
                     {% endif %}
                 </tbody>
             </table>
